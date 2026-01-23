@@ -1,48 +1,85 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "../api/axios";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const login = async () => {
+  const login = async (e) => {
+    if(e) e.preventDefault();
+    setLoading(true);
+    setError(""); 
     try {
-      const res = await axios.post("/auth/login", {
-        email,
-        password
-      });
-
+      const res = await axios.post("/auth/login", { email, password });
       localStorage.setItem("token", res.data.token);
-      window.location.href = "/dashboard";
+      navigate("/dashboard"); 
     } catch (err) {
-      alert("Invalid email or password");
-      console.error(err);
+      setError(err.response?.data?.message || "Invalid credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="min-h-screen premium-gradient flex items-center justify-center px-4">
+      <div className="glass-card w-full max-w-md p-10 border-t-white/20">
+        <div className="text-center mb-10">
+          <h2 className="page-title">Welcome Back</h2>
+          <p className="text-slate-400 font-medium">Elevate your sharing experience</p>
+        </div>
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-      />
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-xl mb-6 text-center animate-pulse">
+            {error}
+          </div>
+        )}
 
-      <br />
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-400 uppercase ml-1">Email Address</label>
+            <input
+              type="email"
+              placeholder="name@domain.com"
+              className="input"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              disabled={loading}
+            />
+          </div>
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-      />
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-400 uppercase ml-1">Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              className="input"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              disabled={loading}
+              onKeyDown={(e) => e.key === 'Enter' && login()}
+            />
+          </div>
 
-      <br />
+          <button 
+            className={`button mt-4 ${loading ? "opacity-50 cursor-wait" : ""}`} 
+            onClick={login}
+            disabled={loading}
+          >
+            {loading ? "Authenticating..." : "Sign In"}
+          </button>
+        </div>
 
-      <button onClick={login}>Login</button>
+        <p className="text-center text-sm text-slate-500 mt-8">
+          New to the platform?{" "}
+          <Link to="/register" className="text-white font-bold hover:text-indigo-400 transition-colors">
+            Join Now
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
