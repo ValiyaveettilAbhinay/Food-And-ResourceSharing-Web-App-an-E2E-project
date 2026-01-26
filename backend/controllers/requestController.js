@@ -4,18 +4,36 @@ const Item = require("../models/Item");
 // Send request for an item
 exports.sendRequest = async (req, res) => {
   const { itemId } = req.body;
+  const userId = req.user.id; // From your auth middleware
 
-  const item = await Item.findById(itemId);
-  if (!item || item.status !== "available") {
-    return res.status(400).json({ msg: "Item not available" });
+  try {
+    const item = await Item.findById(itemId);
+    
+    if (!item || item.status !== "available") {
+      return res.status(400).json({ msg: "Item not available" });
+    }
+
+    // --- NEW: Prevent owner from claiming their own item ---
+    // Note: check if your model uses 'owner' or 'userId'
+    if (item.owner.toString() === userId) {
+      return res.status(400).json({ msg: "You cannot claim your own resource" });
+    }
+
+    // --- OPTIONAL: Prevent duplicate requests ---
+    const existingRequest = await Request.findOne({ item: itemId, requester: userId });
+    if (existingRequest) {
+      return res.status(400).json({ msg: "You have already requested this item" });
+    }
+
+    const request = await Request.create({
+      item: itemId,
+      requester: userId
+    });
+
+    res.json(request);
+  } catch (error) {
+    res.status(500).json({ msg: "Server error" });
   }
-
-  const request = await Request.create({
-    item: itemId,
-    requester: req.user.id
-  });
-
-  res.json(request);
 };
 
 // Approve or Reject request

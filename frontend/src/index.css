@@ -53,4 +53,59 @@
     @apply text-4xl font-black mb-2 tracking-tighter bg-clip-text text-transparent 
            bg-gradient-to-b from-white to-white/50;
   }
+  /* --- Custom Item Card Styling --- */
+
+.custom-card {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.custom-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.custom-card-img {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.custom-card-body {
+    padding: 20px;
+}
+
+/* The Professional Claim Button */
+.btn-claim {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-claim:hover {
+    filter: brightness(1.1);
+    transform: scale(1.02);
+}
+
+.btn-claim:active {
+    transform: scale(0.98);
+}
+
+.btn-claim:disabled {
+    background: #d1d1d1;
+    cursor: not-allowed;
+}
 }
